@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.fans.content.mapper.FansPostPubMapper">
+    <resultMap type="org.jeecg.modules.fans.content.entity.FansPostPub" id="FansPostPubResult">
+        <result property="postId"    column="post_id"    />
+        <result property="postTitle"    column="post_title"    />
+        <result property="roleId"    column="role_id"    />
+        <result property="domain"    column="domain"    />
+        <result property="domainAccount"    column="domain_account"    />
+        <result property="content"    column="content"    />
+        <result property="features"    column="features"    />
+        <result property="imgPath"    column="img_Path"    />
+        <result property="profile"    column="profile"/>
+        <result property="name"    column="name" />
+        <result property="country"    column="country" />
+        <result property="link"    column="link" />
+        <result property="isFace"    column="is_face" />
+
+    </resultMap>
+
+    <sql id="selectToFansPostPubSQL">
+        select p.id as post_id,p.title as post_title,p.content as content,p.features as features,p.img_Path as img_Path,p.role_id as role_id ,a.fans_domain as domain,a.username as domain_account,a.profile as profile,a.name as name,a.country as country,a.link as link,p.is_face as is_face from fans_ctrl_account a left join fans_post p on a.role_temple_id=p.role_id
+    </sql>
+
+    <select id="selectToFansPostPub" parameterType="java.lang.String" resultMap="FansPostPubResult">
+        <include refid="selectToFansPostPubSQL"/>
+        <where>
+            p.id = #{id} and a.online_status='ok'
+        </where>
+    </select>
+
+    <select id="selectHasFansPostPub" parameterType="java.lang.String" resultType="java.lang.String">
+        select DISTINCT(domain_account) as domain_account from fans_post_pub where is_publish='ok' and domain= #{domain}
+    </select>
+
+    <insert id="replaceToFansPostPub" parameterType="org.jeecg.modules.fans.content.entity.FansPostPub"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into fans_post_pub
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="postId != null">post_id,</if>
+            <if test="postTitle != null">post_title,</if>
+            <if test="roleId != null">role_id,</if>
+            <if test="domain != null">domain,</if>
+            <if test="domainAccount != null">domain_account,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="postId != null">#{postId},</if>
+            <if test="postTitle != null">#{postTitle},</if>
+            <if test="roleId != null">#{roleId},</if>
+            <if test="domain != null">#{domain},</if>
+            <if test="domainAccount != null">#{domainAccount},</if>
+        </trim>
+         ON DUPLICATE KEY UPDATE
+        <trim  suffixOverrides=",">
+            <if test="postTitle != null">post_title = #{postTitle},</if>
+            <if test="roleId != null">role_id = #{roleId},</if>
+            <if test="domain != null">domain = #{domain},</if>
+        </trim>
+    </insert>
+
+</mapper>
